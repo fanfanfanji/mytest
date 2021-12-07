@@ -2,6 +2,7 @@ package edu.soft1.controller;
 
 import edu.soft1.pojo.User;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -42,24 +44,24 @@ public class UserController {
     }
 
     @RequestMapping(value = "upload2",method = {RequestMethod.POST})
-    public String fileUpload2(MultipartFile[] images,HttpServletRequest request) throws IOException {
-        InputStream is = null;
-        OutputStream os = null;
+    public String fileUpload2(MultipartFile[] images,HttpServletRequest request,Map<String,Object> map) throws IOException {
+        InputStream is = null;OutputStream os = null;
+        int count = 0;
         for (MultipartFile image:images) {
             is = image.getInputStream();
             String filename = image.getOriginalFilename();
-            System.out.println("文件原名称="+filename);
-            if (filename.equals("")){
-                System.out.println("空字符串，进入下一轮循环");
-                continue;
-            }
+            System.out.println("文件原名称=" + filename);
+            if (filename.equals("")) {
+                continue;}
             String realPath = request.getServletContext().getRealPath("/images");
-            System.out.println("上传路径="+realPath);
-            os = new FileOutputStream(new File(realPath,doFileName(filename)));
-            IOUtils.copy(is,os);
+            System.out.println("上传路径=" + realPath);
+            os = new FileOutputStream(new File(realPath, doFileName(filename)));
+            int size = IOUtils.copy(is, os);
+            if (size > 0) {count++;}
         }
-        os.close();
-        is.close();
+        os.close();is.close();
+        map.put("msg2",count);
+        System.out.println("成功上传"+count+"张图片！");
         return "welcome";
     }
     private String doFileName2(String filename) {
@@ -69,24 +71,42 @@ public class UserController {
         return uuid+"."+extension;
     }
 
-    @RequestMapping(value = "/load.do/{filename}")
-    public void load(@PathVariable String filename, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setHeader("Content-Disposition","attachment;filename="+文件名);
+    @RequestMapping(value="/load.do/{fileName}",method={RequestMethod.GET})
+    public void load(@PathVariable String fileName, HttpServletRequest request, HttpServletResponse response)
+            throws IOException{
+        //设置文件下载
+        response.setHeader("Content-Disposition","attachment;filename="+doFileName2(request, fileName));
+        //文件存储的真实位置
         String realPath = request.getServletContext().getRealPath("/images");
-        System.out.println("下载路径="+realPath);
-        FileInputStream is = new FileInputStream(new File(realPath,filename));
+        System.out.println("下载路径realPath="+realPath);
+        //根据存储的文件，获取输入流对象
+        InputStream is = new FileInputStream(new File(realPath, fileName));
+        //根据相应对象获取输出流对象
         OutputStream os = response.getOutputStream();
-        IOUtils.copy(is,os);
-        os.close();is.close();
-    }
-    private String doFilename2(String filename,HttpServletRequest request){
-        String userAgent = request.getHeader("User-Agent");
-        if (userAgent.toUpperCase().indexOf("FIREFOX")>0){
-            filename = "?UTF-8?B?";
+        //把输入流写入输出流
+        int size = IOUtils.copy(is, os);
+        if (size > 0){
+
         }
-
-        return "";
-
+        //释放资源，原则：先开后关，后开先关
+        os.close();
+        is.close();
+    }
+    //针对中文名称，需要分浏览器来处理
+    public String doFileName2(HttpServletRequest request, String filename){
+        try{
+            //获取请求头部信息的User-Agent对应的值
+            String userAgent=request.getHeader("User-Agent");
+            if(userAgent.toUpperCase().indexOf("FIREFOX")>0){//火狐浏览器
+                filename= "=?UTF-8?B?"+(new String(Base64.encodeBase64(filename.getBytes("utf-8"))))+"?=";
+            }else{//其他浏览器
+                filename  = URLEncoder.encode(filename,"utf-8");
+            }
+            System.out.println("下载文件名="+filename);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return filename;
     }
 
 

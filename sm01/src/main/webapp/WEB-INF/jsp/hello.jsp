@@ -9,7 +9,12 @@
     <p>${CRUDmsg}</p>
     <a href="${pageContext.request.contextPath}/user/welcome.do">返回欢迎页面</a>
 </div>
-
+<div>
+    <form action="${pageContext.request.contextPath}/user/upload2.do" enctype="multipart/form-data" method="post">
+        上传头像:<input type="file" name="images"><br>
+        <input type="submit" value="上传"><br>
+    </form>
+</div>
 <div>
     <form action="${pageContext.request.contextPath}/user/upload2.do" enctype="multipart/form-data" method="post">
         上传图片1:<input type="file" name="images"><br>
@@ -21,18 +26,12 @@
 
 <h2>点击图片完成下载</h2>
 <div>
-    <a href="${pageContext.request.contextPath}/user/load.do/blossom1.jpg">
-        <img src="${pageContext.request.contextPath}/images/blossom1.jpg" width="300px">
-    </a>
-    <a href="${pageContext.request.contextPath}/user/load.do/blossom2.jpg">
-        <img src="${pageContext.request.contextPath}/images/blossom2.jpg" width="300px">
-    </a>
-    <a href="${pageContext.request.contextPath}/user/load.do/菊花.jpg">
-        <img src="${pageContext.request.contextPath}/images/菊花.jpg" width="300px">
-    </a>
-    <a href="${pageContext.request.contextPath}/user/load.do/Desert.jpg">
-        <img src="${pageContext.request.contextPath}/images/Desert.jpg" width="300px">
-    </a>
+    <div>
+        <a href="${pageContext.request.contextPath}/user/load.do/blossom1.jpg"><img src="${pageContext.request.contextPath}/images/blossom1.jpg" width="300px"></a>
+        <a href="${pageContext.request.contextPath}/user/load.do/blossom2.jpg"><img src="${pageContext.request.contextPath}/images/blossom2.jpg" width="300px"></a>
+        <a href="${pageContext.request.contextPath}/user/load.do/菊花.jpg"><img src="${pageContext.request.contextPath}/images/菊花.jpg" width="300px"></a>
+        <a href="${pageContext.request.contextPath}/user/load.do/Desert.jpg"><img src="${pageContext.request.contextPath}/images/Desert.jpg" width="300px"></a>
+    </div>
 </div>
 </body>
 

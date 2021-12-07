@@ -9,6 +9,12 @@
     <title>超市订单管理系统</title>
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/statics/css/style.css" />
     <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/statics/css/public.css" />
+    <c:if test="${msg=='uploadSuccess'}">
+        <script type="text/javascript">alert("上传成功");</script>
+    </c:if>
+    <c:if test="${msg2>0}">
+        <script type="text/javascript">alert("上传成功${msg2}张图片！");</script>
+    </c:if>
 </head>
 <body>
 <!--头部-->
